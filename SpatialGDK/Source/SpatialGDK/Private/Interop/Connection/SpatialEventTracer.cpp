@@ -21,6 +21,10 @@ void SpatialEventTracer::TraceCallback(void* UserData, const Trace_Item* Item)
 		return;
 	}
 
+#ifdef DEBUG_EVENT_TRACING
+	DebugTraceItem(Item);
+#endif // DEBUG_EVENT_TRACING
+
 	uint32_t ItemSize = Trace_GetSerializedItemSize(Item);
 	if (EventTracer->BytesWrittenToStream + ItemSize <= EventTracer->MaxFileSize)
 	{
@@ -36,6 +40,36 @@ void SpatialEventTracer::TraceCallback(void* UserData, const Trace_Item* Item)
 		EventTracer->BytesWrittenToStream = EventTracer->MaxFileSize;
 	}
 }
+
+#ifdef DEBUG_EVENT_TRACING
+void SpatialEventTracer::DebugTraceItem(const Trace_Item* Item)
+{
+	if (Item->item_type == TRACE_ITEM_TYPE_EVENT)
+	{
+		const Trace_Event& Event = Item->item.event;
+		FString SpanIdString = SpatialEventTracer::SpanIdToString(Event.span_id);
+		UE_LOG(LogSpatialEventTracer, Log, TEXT("Event: %s SpanId: %s"), *FString(Event.type), *SpanIdString);
+	}
+	else if (Item->item_type == TRACE_ITEM_TYPE_SPAN)
+	{
+		const Trace_Span& Span = Item->item.span;
+		FString SpanIdString = SpanIdToString(Span.id);
+		FString Causes;
+
+		for (uint32 i = 0; i < Span.cause_count; ++i)
+		{
+			if (i > 0)
+			{
+				Causes += ", ";
+			}
+
+			Causes += SpanIdToString(Span.causes[i]);
+		}
+
+		UE_LOG(LogSpatialEventTracer, Log, TEXT("SpanId: %s Causes: %s"), *SpanIdString, *Causes);
+	}
+}
+#endif // DEBUG_EVENT_TRACING
 
 SpatialScopedActiveSpanId::SpatialScopedActiveSpanId(SpatialEventTracer* InEventTracer, const TOptional<Trace_SpanId>& InCurrentSpanId)
 	: CurrentSpanId(InCurrentSpanId)
@@ -75,6 +109,16 @@ SpatialEventTracer::~SpatialEventTracer()
 		Trace_EventTracer_Disable(EventTracer);
 		Trace_EventTracer_Destroy(EventTracer);
 	}
+}
+
+FString SpatialEventTracer::SpanIdToString(const Trace_SpanId& SpanId)
+{
+	FString HexStr;
+	for (int i = 0; i < 16; i++)
+	{
+		HexStr += FString::Printf(TEXT("%02x"), SpanId.data[i]);
+	}
+	return HexStr;
 }
 
 TOptional<Trace_SpanId> SpatialEventTracer::CreateSpan()
@@ -169,7 +213,7 @@ void SpatialEventTracer::Enable(const FString& FileName)
 	{
 		EventTracePath = FPaths::GetPath(AbsLogPath);
 	}
-	const FString FolderPath = EventTracePath;
+	FolderPath = EventTracePath;
 
 	const FString FullFileName = FString::Printf(TEXT("EventTrace_%s_%s.trace"), *FileName, *FDateTime::Now().ToString());
 	const FString FilePath = FPaths::Combine(FolderPath, FullFileName);
@@ -210,7 +254,7 @@ void SpatialEventTracer::UpdateComponent(const Worker_Op& Op)
 
 	Trace_SpanId MergeCauses[2] = { Op.span_id, OldSpanId };
 	TOptional<Trace_SpanId> SpanId = CreateSpan(MergeCauses, 2);
-	TraceEvent(FSpatialTraceEventBuilder::CreateMergeComponent(Id.EntityId, Id.ComponentId), SpanId);
+	TraceEvent(FSpatialTraceEventBuilder::CreateMergeComponentUpdate(Id.EntityId, Id.ComponentId), SpanId);
 
 	OldSpanId = SpanId.GetValue();
 }

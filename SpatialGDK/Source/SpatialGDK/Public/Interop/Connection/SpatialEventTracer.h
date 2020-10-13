@@ -15,7 +15,7 @@ DECLARE_LOG_CATEGORY_EXTERN(LogSpatialEventTracer, Log, All);
 namespace SpatialGDK
 {
 // SpatialEventTracer wraps Trace_EventTracer related functionality
-class SpatialEventTracer
+class SPATIALGDK_API SpatialEventTracer
 {
 public:
 	explicit SpatialEventTracer(const FString& WorkerId);
@@ -36,6 +36,10 @@ public:
 
 	Trace_SpanId GetSpanId(const EntityComponentId& Id) const;
 
+	static FString SpanIdToString(const Trace_SpanId& SpanId);
+
+	const FString& GetFolderPath() const { return FolderPath; }
+
 private:
 	struct StreamDeleter
 	{
@@ -43,6 +47,9 @@ private:
 	};
 
 	static void TraceCallback(void* UserData, const Trace_Item* Item);
+#ifdef DEBUG_EVENT_TRACING
+	static void DebugTraceItem(const Trace_Item* Item);
+#endif // DEBUG_EVENT_TRACING
 
 	void Enable(const FString& FileName);
 
@@ -54,6 +61,7 @@ private:
 	bool bEnabled = false;
 	uint64 BytesWrittenToStream = 0;
 	uint64 MaxFileSize = 0;
+	FString FolderPath;
 };
 
 // SpatialScopedActiveSpanIds are creating prior to calling worker send functions so that worker can use the input SpanId to continue
