@@ -9,14 +9,6 @@
 
 DECLARE_LOG_CATEGORY_EXTERN(LogEventTracingTest, Log, All);
 
-namespace worker
-{
-namespace c
-{
-struct Trace_Item;
-} // namespace c
-} // namespace worker
-
 UCLASS()
 class SPATIALGDKFUNCTIONALTESTS_API AEventTracingTest : public ASpatialFunctionalTest
 {
@@ -30,6 +22,8 @@ public:
 protected:
 	FName ReceiveOpEventName = "worker.receive_op";
 	FName MergeComponentUpdateEventName = "unreal_gdk.merge_component_update";
+	FName ProcessRPCEventName = "unreal_gdk.process_rpc";
+	FName SendRPCEventName = "unreal_gdk.send_rpc";
 
 	FWorkerDefinition WorkerDefinition;
 	TArray<FName> FilterEventNames;

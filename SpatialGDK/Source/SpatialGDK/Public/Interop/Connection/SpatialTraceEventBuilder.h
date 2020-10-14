@@ -47,6 +47,9 @@ private:
 	static FString AuthorityToString(Worker_Authority Authority);
 	static FString BoolToString(bool bInput);
 
+	FSpatialTraceEventBuilder(FString InType);
+	FSpatialTraceEventBuilder(FString InType, FString InMessage);
+
 	FSpatialTraceEventBuilder AddObject(FString Key, const UObject* Object);
 	FSpatialTraceEventBuilder AddFunction(FString Key, const UFunction* Function);
 	FSpatialTraceEventBuilder AddEntityId(FString Key, const Worker_EntityId EntityId);

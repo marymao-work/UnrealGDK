@@ -3,6 +3,7 @@
 #pragma once
 
 #include "Interop/Connection/SpatialTraceEvent.h"
+#include "Interop/Connection/SpatialSpanIdStack.h"
 #include "SpatialView/EntityComponentId.h"
 
 #include <WorkerSDK/improbable/c_io.h>
@@ -37,8 +38,11 @@ public:
 	Trace_SpanId GetSpanId(const EntityComponentId& Id) const;
 
 	static FString SpanIdToString(const Trace_SpanId& SpanId);
+	static Trace_SpanId StringToSpanId(const FString& SpanIdString);
 
 	const FString& GetFolderPath() const { return FolderPath; }
+
+	FSpatialSpanIdStack SpanIdStack;
 
 private:
 	struct StreamDeleter

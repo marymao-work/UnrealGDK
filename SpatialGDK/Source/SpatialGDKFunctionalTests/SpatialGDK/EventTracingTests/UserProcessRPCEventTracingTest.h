@@ -5,17 +5,18 @@
 #include "CoreMinimal.h"
 #include "EventTracingTest.h"
 
-#include "ProcessRPCEventTracingTest.generated.h"
+#include "UserProcessRPCEventTracingTest.generated.h"
 
 UCLASS()
-class SPATIALGDKFUNCTIONALTESTS_API AProcessRPCEventTracingTest : public AEventTracingTest
+class SPATIALGDKFUNCTIONALTESTS_API AUserProcessRPCEventTracingTest : public AEventTracingTest
 {
 	GENERATED_BODY()
 
 public:
-	AProcessRPCEventTracingTest();
+	AUserProcessRPCEventTracingTest();
 
 private:
+	FName UserEventName = "user.process_rpc";
 
 	virtual void FinishEventTraceTest() override;
 };

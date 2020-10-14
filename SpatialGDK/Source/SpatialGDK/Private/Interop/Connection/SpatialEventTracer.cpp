@@ -121,11 +121,30 @@ FString SpatialEventTracer::SpanIdToString(const Trace_SpanId& SpanId)
 	return HexStr;
 }
 
+Trace_SpanId SpatialEventTracer::StringToSpanId(const FString& SpanIdString)
+{
+	Trace_SpanId SpanId;
+	for (int i = 0; i < 16; i++)
+	{
+		FString SubString = SpanIdString.Mid(i*2, 2);
+		unsigned int Value;
+		sscanf(TCHAR_TO_ANSI(*SubString), "%02x", &Value);
+		SpanId.data[i] = Value;
+	}
+	return SpanId;
+}
+
 TOptional<Trace_SpanId> SpatialEventTracer::CreateSpan()
 {
 	if (!IsEnabled())
 	{
 		return {};
+	}
+
+	if (SpanIdStack.HasSpanId())
+	{
+		TArray<Trace_SpanId> CauseSpanIds = SpanIdStack.GetTopLayer();
+		return Trace_EventTracer_AddSpan(EventTracer, CauseSpanIds.GetData(), CauseSpanIds.Num());
 	}
 
 	return Trace_EventTracer_AddSpan(EventTracer, nullptr, 0);
@@ -143,7 +162,7 @@ TOptional<Trace_SpanId> SpatialEventTracer::CreateSpan(const Trace_SpanId* Cause
 		return Trace_EventTracer_AddSpan(EventTracer, Causes, NumCauses);
 	}
 
-	return Trace_EventTracer_AddSpan(EventTracer, nullptr, 0);
+	return CreateSpan();
 }
 
 void SpatialEventTracer::TraceEvent(FSpatialTraceEvent SpatialTraceEvent, const TOptional<Trace_SpanId>& OptionalSpanId)
