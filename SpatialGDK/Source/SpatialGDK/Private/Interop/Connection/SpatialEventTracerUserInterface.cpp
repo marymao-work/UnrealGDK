@@ -45,7 +45,8 @@ void USpatialEventTracerUserInterface::TraceEvent(UObject* WorldContextObject, F
 	EventTracer->TraceEvent(SpatialTraceEvent, SpatialGDK::SpatialEventTracer::StringToSpanId(SpanId));
 }
 
-void USpatialEventTracerUserInterface::SetActiveSpanId(UObject* WorldContextObject, FEventTracerDynamicDelegate Delegate, const FString& SpanId)
+void USpatialEventTracerUserInterface::SetActiveSpanId(UObject* WorldContextObject, FEventTracerDynamicDelegate Delegate,
+													   const FString& SpanId)
 {
 	SpatialGDK::SpatialEventTracer* EventTracer = GetEventTracer(WorldContextObject);
 	if (EventTracer == nullptr)

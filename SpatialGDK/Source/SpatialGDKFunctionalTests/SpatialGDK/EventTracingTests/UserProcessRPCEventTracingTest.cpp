@@ -27,7 +27,7 @@ void AUserProcessRPCEventTracingTest::FinishEventTraceTest()
 
 		EventsTested++;
 
-		if (!CheckEventTraceCause(SpanIdString, { ProcessRPCEventName}, 1))
+		if (!CheckEventTraceCause(SpanIdString, { ProcessRPCEventName }, 1))
 		{
 			EventsFailed++;
 		}

@@ -2,8 +2,8 @@
 
 #pragma once
 
-#include "Interop/Connection/SpatialTraceEvent.h"
 #include "Interop/Connection/SpatialSpanIdStack.h"
+#include "Interop/Connection/SpatialTraceEvent.h"
 #include "SpatialView/EntityComponentId.h"
 
 #include <WorkerSDK/improbable/c_io.h>

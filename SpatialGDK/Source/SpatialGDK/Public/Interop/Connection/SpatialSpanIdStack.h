@@ -9,7 +9,6 @@ namespace SpatialGDK
 class FSpatialSpanIdStack
 {
 public:
-
 	void AddNewLayer(const Trace_SpanId SpanId);
 	void AddToLayer(const Trace_SpanId SpanId);
 	TArray<Trace_SpanId> PopLayer();

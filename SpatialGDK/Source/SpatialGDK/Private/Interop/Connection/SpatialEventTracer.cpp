@@ -126,7 +126,7 @@ Trace_SpanId SpatialEventTracer::StringToSpanId(const FString& SpanIdString)
 	Trace_SpanId SpanId;
 	for (int i = 0; i < 16; i++)
 	{
-		FString SubString = SpanIdString.Mid(i*2, 2);
+		FString SubString = SpanIdString.Mid(i * 2, 2);
 		unsigned int Value;
 		sscanf(TCHAR_TO_ANSI(*SubString), "%02x", &Value);
 		SpanId.data[i] = Value;

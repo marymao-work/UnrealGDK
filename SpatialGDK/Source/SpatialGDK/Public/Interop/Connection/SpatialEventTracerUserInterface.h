@@ -13,7 +13,7 @@ DECLARE_DYNAMIC_DELEGATE(FEventTracerDynamicDelegate);
 
 namespace SpatialGDK
 {
-	class SpatialEventTracer;
+class SpatialEventTracer;
 }
 
 UCLASS()
