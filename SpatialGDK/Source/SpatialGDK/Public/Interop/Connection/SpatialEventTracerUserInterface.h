@@ -41,6 +41,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "SpatialOS|EventTracing", meta = (WorldContext = "WorldContextObject"))
 	static void AddLatentSpanId(UObject* WorldContextObject, UObject* Object, const FString& SpanId);
 
+	static void AddSpanIdToStack(UObject* WorldContextObject, const FString& SpanId);
+	static void PopSpanIdFromStack(UObject* WorldContextObject);
+
 private:
 	static void AddLatentActorSpanId(UObject* WorldContextObject, const AActor& Actor, const FString& SpanId);
 	static void AddLatentComponentSpanId(UObject* WorldContextObject, const UActorComponent& Component, const FString& SpanId);

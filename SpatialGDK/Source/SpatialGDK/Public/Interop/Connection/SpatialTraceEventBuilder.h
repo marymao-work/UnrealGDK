@@ -10,9 +10,25 @@
 
 namespace SpatialGDK
 {
-class FSpatialTraceEventBuilder
+class SPATIALGDK_API FSpatialTraceEventBuilder
 {
+
 public:
+	FSpatialTraceEventBuilder(FString InType);
+	FSpatialTraceEventBuilder(FString InType, FString InMessage);
+
+	FSpatialTraceEventBuilder AddObject(FString Key, const UObject* Object);
+	FSpatialTraceEventBuilder AddFunction(FString Key, const UFunction* Function);
+	FSpatialTraceEventBuilder AddEntityId(FString Key, const Worker_EntityId EntityId);
+	FSpatialTraceEventBuilder AddComponentId(FString Key, const Worker_ComponentId ComponentId);
+	FSpatialTraceEventBuilder AddFieldId(FString Key, const uint32 FieldId);
+	FSpatialTraceEventBuilder AddNewWorkerId(FString Key, const uint32 NewWorkerId);
+	FSpatialTraceEventBuilder AddCommand(FString Key, const FString& Command);
+	FSpatialTraceEventBuilder AddRequestId(FString Key, const int64 RequestId);
+	FSpatialTraceEventBuilder AddAuthority(FString Key, const Worker_Authority Role);
+	FSpatialTraceEventBuilder AddKeyValue(FString Key, FString Value);
+	FSpatialTraceEvent GetEvent() && ;
+
 	static FSpatialTraceEvent CreateProcessRPC(const UObject* Object, UFunction* Function);
 	static FSpatialTraceEvent CreateSendRPC(const UObject* Object, UFunction* Function);
 	static FSpatialTraceEvent CreateQueueRPC();
@@ -48,21 +64,6 @@ public:
 private:
 	static FString AuthorityToString(Worker_Authority Authority);
 	static FString BoolToString(bool bInput);
-
-	FSpatialTraceEventBuilder(FString InType);
-	FSpatialTraceEventBuilder(FString InType, FString InMessage);
-
-	FSpatialTraceEventBuilder AddObject(FString Key, const UObject* Object);
-	FSpatialTraceEventBuilder AddFunction(FString Key, const UFunction* Function);
-	FSpatialTraceEventBuilder AddEntityId(FString Key, const Worker_EntityId EntityId);
-	FSpatialTraceEventBuilder AddComponentId(FString Key, const Worker_ComponentId ComponentId);
-	FSpatialTraceEventBuilder AddFieldId(FString Key, const uint32 FieldId);
-	FSpatialTraceEventBuilder AddNewWorkerId(FString Key, const uint32 NewWorkerId);
-	FSpatialTraceEventBuilder AddCommand(FString Key, const FString& Command);
-	FSpatialTraceEventBuilder AddRequestId(FString Key, const int64 RequestId);
-	FSpatialTraceEventBuilder AddAuthority(FString Key, const Worker_Authority Role);
-	FSpatialTraceEventBuilder AddKeyValue(FString Key, FString Value);
-	FSpatialTraceEvent GetEvent() &&;
 
 	FSpatialTraceEvent SpatialTraceEvent;
 };

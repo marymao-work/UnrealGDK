@@ -59,11 +59,30 @@ void USpatialEventTracerUserInterface::SetActiveSpanId(UObject* WorldContextObje
 		return;
 	}
 
-	Trace_SpanId NewSpanId = SpatialGDK::SpatialEventTracer::StringToSpanId(SpanId);
-	FString NewString = SpatialGDK::SpatialEventTracer::SpanIdToString(NewSpanId);
-
 	EventTracer->SpanIdStack.AddNewLayer(SpatialGDK::SpatialEventTracer::StringToSpanId(SpanId));
 	Delegate.Execute();
+	EventTracer->SpanIdStack.PopLayer();
+}
+
+void USpatialEventTracerUserInterface::AddSpanIdToStack(UObject* WorldContextObject, const FString& SpanId)
+{
+	SpatialGDK::SpatialEventTracer* EventTracer = GetEventTracer(WorldContextObject);
+	if (EventTracer == nullptr)
+	{
+		return;
+	}
+
+	EventTracer->SpanIdStack.AddNewLayer(SpatialGDK::SpatialEventTracer::StringToSpanId(SpanId));
+}
+
+void USpatialEventTracerUserInterface::PopSpanIdFromStack(UObject* WorldContextObject)
+{
+	SpatialGDK::SpatialEventTracer* EventTracer = GetEventTracer(WorldContextObject);
+	if (EventTracer == nullptr)
+	{
+		return;
+	}
+
 	EventTracer->SpanIdStack.PopLayer();
 }
 
