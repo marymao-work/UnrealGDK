@@ -16,5 +16,6 @@ public:
 	AProcessRPCEventTracingTest();
 
 private:
+
 	virtual void FinishEventTraceTest() override;
 };

@@ -11,10 +11,14 @@
 
 DECLARE_DYNAMIC_DELEGATE(FEventTracerDynamicDelegate);
 
+DECLARE_LOG_CATEGORY_EXTERN(LogSpatialEventTracerUserInterface, Log, All);
+
 namespace SpatialGDK
 {
 class SpatialEventTracer;
 }
+
+class USpatialNetDriver;
 
 UCLASS()
 class SPATIALGDK_API USpatialEventTracerUserInterface : public UBlueprintFunctionLibrary
@@ -34,6 +38,15 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "SpatialOS|EventTracing", meta = (WorldContext = "WorldContextObject"))
 	static void SetActiveSpanId(UObject* WorldContextObject, FEventTracerDynamicDelegate Delegate, const FString& SpanId);
 
+	UFUNCTION(BlueprintCallable, Category = "SpatialOS|EventTracing", meta = (WorldContext = "WorldContextObject"))
+	static void AddLatentSpanId(UObject* WorldContextObject, UObject* Object, const FString& SpanId);
+
 private:
+
+	static void AddLatentActorSpanId(UObject* WorldContextObject, const AActor& Actor, const FString& SpanId);
+	static void AddLatentComponentSpanId(UObject* WorldContextObject, const UActorComponent& Component, const FString& SpanId);
+
+
 	static SpatialGDK::SpatialEventTracer* GetEventTracer(UObject* WorldContextObject);
+	static USpatialNetDriver* GetSpatialNetDriver(UObject* WorldContextObject);
 };

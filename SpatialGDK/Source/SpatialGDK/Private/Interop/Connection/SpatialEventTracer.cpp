@@ -290,4 +290,33 @@ Trace_SpanId SpatialEventTracer::GetSpanId(const EntityComponentId& Id) const
 
 		return *SpanId;
 }
+
+void SpatialEventTracer::AddLatentPropertyUpdateSpanIds(const EntityComponentId& Id, Trace_SpanId SpanId)
+{
+	FSpatialSpanIdStack& Stack = EntityComponentSpanIdStacks.FindOrAdd(Id);
+	Stack.AddToLayer(SpanId);
+}
+
+TArray<Trace_SpanId> SpatialEventTracer::GetLatentPropertyUpdateSpanIds(const EntityComponentId& Id)
+{
+	if (!IsEnabled())
+	{
+		return {};
+	}
+
+	FSpatialSpanIdStack* Stack = EntityComponentSpanIdStacks.Find(Id);
+	if (Stack == nullptr)
+	{
+		return {};
+	}
+
+	TArray<Trace_SpanId> SpanIds = Stack->PopLayer();
+	if (!Stack->HasSpanId())
+	{
+		EntityComponentSpanIdStacks.Remove(Id);
+	}
+
+	return SpanIds;
+}
+
 } // namespace SpatialGDK

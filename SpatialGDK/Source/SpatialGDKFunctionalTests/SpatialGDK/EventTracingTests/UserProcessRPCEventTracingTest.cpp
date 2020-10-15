@@ -7,7 +7,7 @@ AUserProcessRPCEventTracingTest::AUserProcessRPCEventTracingTest()
 	Author = "Matthew Sandford";
 	Description = TEXT("Test checking user event traces can be caused by rpcs process events");
 
-	FilterEventNames = { UserEventName, ProcessRPCEventName };
+	FilterEventNames = { UserProcessRPCEventName, ProcessRPCEventName };
 	WorkerDefinition = FWorkerDefinition::Client(1);
 }
 
@@ -20,7 +20,7 @@ void AUserProcessRPCEventTracingTest::FinishEventTraceTest()
 		const FString& SpanIdString = Pair.Key;
 		const FName EventName = Pair.Value;
 
-		if (EventName != UserEventName)
+		if (EventName != UserProcessRPCEventName)
 		{
 			continue;
 		}

@@ -16,7 +16,7 @@ public:
 	AUserProcessRPCEventTracingTest();
 
 private:
-	FName UserEventName = "user.process_rpc";
+	FName UserProcessRPCEventName = "user.process_rpc";
 
 	virtual void FinishEventTraceTest() override;
 };

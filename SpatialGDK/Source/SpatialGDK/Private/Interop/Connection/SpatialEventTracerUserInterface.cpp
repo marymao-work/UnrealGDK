@@ -2,9 +2,14 @@
 
 #include "Interop/Connection/SpatialEventTracerUserInterface.h"
 
+#include "EngineClasses/SpatialPackageMapClient.h"
 #include "EngineClasses/SpatialNetDriver.h"
 #include "Interop/Connection/SpatialEventTracer.h"
 #include "Interop/Connection/SpatialWorkerConnection.h"
+#include "Interop/SpatialClassInfoManager.h"
+#include "SpatialView/EntityComponentId.h"
+
+DEFINE_LOG_CATEGORY(LogSpatialEventTracerUserInterface);
 
 FString USpatialEventTracerUserInterface::CreateSpanId(UObject* WorldContextObject)
 {
@@ -62,7 +67,73 @@ void USpatialEventTracerUserInterface::SetActiveSpanId(UObject* WorldContextObje
 	EventTracer->SpanIdStack.PopLayer();
 }
 
+void USpatialEventTracerUserInterface::AddLatentActorSpanId(UObject* WorldContextObject, const AActor& Actor, const FString& SpanId)
+{
+	SpatialGDK::SpatialEventTracer* EventTracer = GetEventTracer(WorldContextObject);
+	if (EventTracer == nullptr)
+	{
+		return;
+	}
+
+	USpatialNetDriver* NetDriver = GetSpatialNetDriver(WorldContextObject);
+	if (NetDriver == nullptr)
+	{
+		return;
+	}
+
+	const Worker_EntityId EntityId = NetDriver->PackageMap->GetEntityIdFromObject(&Actor);
+	const Worker_ComponentId ComponentId = NetDriver->ClassInfoManager->GetComponentIdForClass(*Actor.GetClass());
+	EventTracer->AddLatentPropertyUpdateSpanIds({ EntityId, ComponentId }, SpatialGDK::SpatialEventTracer::StringToSpanId(SpanId));
+}
+
+void USpatialEventTracerUserInterface::AddLatentComponentSpanId(UObject* WorldContextObject, const UActorComponent& Component, const FString& SpanId)
+{
+	SpatialGDK::SpatialEventTracer* EventTracer = GetEventTracer(WorldContextObject);
+	if (EventTracer == nullptr)
+	{
+		return;
+	}
+
+	USpatialNetDriver* NetDriver = GetSpatialNetDriver(WorldContextObject);
+	if (NetDriver == nullptr)
+	{
+		return;
+	}
+
+	AActor* Owner = Component.GetOwner();
+	if (Owner == nullptr)
+	{
+		return;
+	}
+
+	const Worker_EntityId EntityId = NetDriver->PackageMap->GetEntityIdFromObject(Owner);
+	const Worker_ComponentId ComponentId = NetDriver->ClassInfoManager->GetComponentIdForSpecificSubObject(*Owner->GetClass(), *Component.GetClass());
+	EventTracer->AddLatentPropertyUpdateSpanIds({ EntityId, ComponentId }, SpatialGDK::SpatialEventTracer::StringToSpanId(SpanId));
+}
+
+void USpatialEventTracerUserInterface::AddLatentSpanId(UObject* WorldContextObject, UObject* Object, const FString& SpanId)
+{
+	if (AActor* Actor = Cast<AActor>(Object))
+	{
+		AddLatentActorSpanId(WorldContextObject, *Actor, SpanId);
+	}
+	else if (UActorComponent* Component = Cast<UActorComponent>(Object))
+	{
+		AddLatentComponentSpanId(WorldContextObject, *Component, SpanId);
+	}
+}
+
 SpatialGDK::SpatialEventTracer* USpatialEventTracerUserInterface::GetEventTracer(UObject* WorldContextObject)
+{
+	USpatialNetDriver* NetDriver = GetSpatialNetDriver(WorldContextObject);
+	if (NetDriver != nullptr && NetDriver->Connection != nullptr)
+	{
+		return NetDriver->Connection->GetEventTracer();
+	}
+	return nullptr;
+}
+
+USpatialNetDriver* USpatialEventTracerUserInterface::GetSpatialNetDriver(UObject* WorldContextObject)
 {
 	UWorld* World = GEngine->GetWorldFromContextObject(WorldContextObject, EGetWorldErrorMode::ReturnNull);
 	if (World == nullptr)
@@ -71,9 +142,5 @@ SpatialGDK::SpatialEventTracer* USpatialEventTracerUserInterface::GetEventTracer
 	}
 
 	USpatialNetDriver* NetDriver = Cast<USpatialNetDriver>(World->GetNetDriver());
-	if (NetDriver != nullptr && NetDriver->Connection != nullptr)
-	{
-		return NetDriver->Connection->GetEventTracer();
-	}
-	return nullptr;
+	return NetDriver;
 }
