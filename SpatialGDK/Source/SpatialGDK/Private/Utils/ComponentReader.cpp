@@ -327,7 +327,8 @@ void ComponentReader::ApplySchemaObject(Schema_Object* ComponentObject, UObject&
 					Trace_SpanId CauseSpanId = EventTracer->GetSpanId(EntityComponentId(EntityId, ComponentId));
 					SpanId = EventTracer->CreateSpan(&CauseSpanId, 1);
 					EventTracer->TraceEvent(
-						FSpatialTraceEventBuilder::CreateReceivePropertyUpdate(&Object, EntityId, ComponentId, Cmd.Property->GetName()), SpanId);
+						FSpatialTraceEventBuilder::CreateReceivePropertyUpdate(&Object, EntityId, ComponentId, Cmd.Property->GetName()),
+						SpanId);
 				}
 
 				// Parent.Property is the "root" replicated property, e.g. if a struct property was flattened
@@ -363,7 +364,7 @@ void ComponentReader::ApplySchemaObject(Schema_Object* ComponentObject, UObject&
 
 	Channel.RemoveRepNotifiesWithUnresolvedObjs(RepNotifies, *Replicator->RepLayout, RootObjectReferencesMap, &Object);
 
-	Channel.PostReceiveSpatialUpdate(&Object, RepNotifies, PropertySpanIds); 
+	Channel.PostReceiveSpatialUpdate(&Object, RepNotifies, PropertySpanIds);
 }
 
 void ComponentReader::ApplyHandoverSchemaObject(Schema_Object* ComponentObject, UObject& Object, USpatialActorChannel& Channel,

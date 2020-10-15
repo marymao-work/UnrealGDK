@@ -19,7 +19,6 @@ private:
 	FName UserSendPropertyEventName = "user.send_property";
 	FName UserSendComponentPropertyEventName = "user.send_component_property";
 	FName SendPropertyUpdatesEventName = "unreal_gdk.send_property_updates";
-	
 
 	virtual void FinishEventTraceTest() override;
 };

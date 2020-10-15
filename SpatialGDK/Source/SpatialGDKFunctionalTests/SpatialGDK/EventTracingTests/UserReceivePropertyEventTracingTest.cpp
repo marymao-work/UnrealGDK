@@ -34,9 +34,11 @@ void AUserReceivePropertyEventTracingTest::FinishEventTraceTest()
 	}
 
 	bool bSuccess = EventsTested > 0 && EventsFailed == 0;
-	AssertTrue(bSuccess,
-			   FString::Printf(TEXT("User events have been caused by the expected receive property update events. Events Tested: %d, Events Failed: %d"),
-							   EventsTested, EventsFailed));
+	AssertTrue(
+		bSuccess,
+		FString::Printf(
+			TEXT("User events have been caused by the expected receive property update events. Events Tested: %d, Events Failed: %d"),
+			EventsTested, EventsFailed));
 
 	FinishStep();
 }

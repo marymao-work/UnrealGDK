@@ -2,8 +2,8 @@
 
 #include "Interop/Connection/SpatialEventTracerUserInterface.h"
 
-#include "EngineClasses/SpatialPackageMapClient.h"
 #include "EngineClasses/SpatialNetDriver.h"
+#include "EngineClasses/SpatialPackageMapClient.h"
 #include "Interop/Connection/SpatialEventTracer.h"
 #include "Interop/Connection/SpatialWorkerConnection.h"
 #include "Interop/SpatialClassInfoManager.h"
@@ -86,7 +86,8 @@ void USpatialEventTracerUserInterface::AddLatentActorSpanId(UObject* WorldContex
 	EventTracer->AddLatentPropertyUpdateSpanIds({ EntityId, ComponentId }, SpatialGDK::SpatialEventTracer::StringToSpanId(SpanId));
 }
 
-void USpatialEventTracerUserInterface::AddLatentComponentSpanId(UObject* WorldContextObject, const UActorComponent& Component, const FString& SpanId)
+void USpatialEventTracerUserInterface::AddLatentComponentSpanId(UObject* WorldContextObject, const UActorComponent& Component,
+																const FString& SpanId)
 {
 	SpatialGDK::SpatialEventTracer* EventTracer = GetEventTracer(WorldContextObject);
 	if (EventTracer == nullptr)
@@ -107,7 +108,8 @@ void USpatialEventTracerUserInterface::AddLatentComponentSpanId(UObject* WorldCo
 	}
 
 	const Worker_EntityId EntityId = NetDriver->PackageMap->GetEntityIdFromObject(Owner);
-	const Worker_ComponentId ComponentId = NetDriver->ClassInfoManager->GetComponentIdForSpecificSubObject(*Owner->GetClass(), *Component.GetClass());
+	const Worker_ComponentId ComponentId =
+		NetDriver->ClassInfoManager->GetComponentIdForSpecificSubObject(*Owner->GetClass(), *Component.GetClass());
 	EventTracer->AddLatentPropertyUpdateSpanIds({ EntityId, ComponentId }, SpatialGDK::SpatialEventTracer::StringToSpanId(SpanId));
 }
 

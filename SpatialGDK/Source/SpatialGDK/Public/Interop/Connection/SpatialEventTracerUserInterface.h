@@ -42,10 +42,8 @@ public:
 	static void AddLatentSpanId(UObject* WorldContextObject, UObject* Object, const FString& SpanId);
 
 private:
-
 	static void AddLatentActorSpanId(UObject* WorldContextObject, const AActor& Actor, const FString& SpanId);
 	static void AddLatentComponentSpanId(UObject* WorldContextObject, const UActorComponent& Component, const FString& SpanId);
-
 
 	static SpatialGDK::SpatialEventTracer* GetEventTracer(UObject* WorldContextObject);
 	static USpatialNetDriver* GetSpatialNetDriver(UObject* WorldContextObject);

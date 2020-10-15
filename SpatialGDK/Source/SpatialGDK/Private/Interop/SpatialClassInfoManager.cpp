@@ -393,7 +393,6 @@ uint32 USpatialClassInfoManager::GetComponentIdForSpecificSubObject(const UClass
 	return SpatialConstants::INVALID_COMPONENT_ID;
 }
 
-
 uint32 USpatialClassInfoManager::GetComponentIdForClass(const UClass& Class) const
 {
 	const FString ClassPath = Class.GetPathName();
