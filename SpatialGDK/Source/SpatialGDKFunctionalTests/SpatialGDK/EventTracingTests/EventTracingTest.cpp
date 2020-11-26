@@ -165,7 +165,7 @@ void AEventTracingTest::GatherDataFromFile(const FString& FilePath)
 					CachedEventName = EventName;
 				}
 			}
-			else
+			else if (Item->item_type == TRACE_ITEM_TYPE_SPAN)
 			{
 				const Trace_Span& Span = Item->item.span;
 
