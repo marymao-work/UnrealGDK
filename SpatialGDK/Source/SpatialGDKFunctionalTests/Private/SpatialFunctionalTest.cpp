@@ -31,8 +31,8 @@ namespace
 constexpr float FINISH_TEST_GRACE_PERIOD_DURATION = 2.0f;
 } // namespace
 
-ASpatialFunctionalTest::ASpatialFunctionalTest()
-	: Super()
+ASpatialFunctionalTest::ASpatialFunctionalTest(const FObjectInitializer& ObjectInitializer)
+	: Super(ObjectInitializer)
 	, FlowControllerSpawner(this, ASpatialFunctionalTestFlowController::StaticClass())
 {
 	bReplicates = true;
@@ -49,6 +49,15 @@ ASpatialFunctionalTest::ASpatialFunctionalTest()
 void ASpatialFunctionalTest::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	if (!GetSpatialEnabled())
+	{
+		DISABLE_REPLICATED_PROPERTY(ASpatialFunctionalTest, bReadyToSpawnServerControllers);
+		DISABLE_REPLICATED_PROPERTY(ASpatialFunctionalTest, FlowControllers);
+		DISABLE_REPLICATED_PROPERTY(ASpatialFunctionalTest, CurrentStepIndex);
+		DISABLE_REPLICATED_PROPERTY(ASpatialFunctionalTest, bPreparedTest);
+		DISABLE_REPLICATED_PROPERTY(ASpatialFunctionalTest, bFinishedTest);
+		return;
+	}
 	DOREPLIFETIME(ASpatialFunctionalTest, bReadyToSpawnServerControllers);
 	DOREPLIFETIME(ASpatialFunctionalTest, FlowControllers);
 	DOREPLIFETIME(ASpatialFunctionalTest, CurrentStepIndex);
@@ -105,6 +114,11 @@ void ASpatialFunctionalTest::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 
+	if (!GetSpatialEnabled())
+	{
+		return;
+	}
+
 	// Handle checking for finished
 	if (CurrentStepIndex >= 0)
 	{
@@ -160,12 +174,20 @@ void ASpatialFunctionalTest::Tick(float DeltaSeconds)
 
 void ASpatialFunctionalTest::OnAuthorityGained()
 {
+	if (!GetSpatialEnabled())
+	{
+		return;
+	}
 	bReadyToSpawnServerControllers = true;
 	StartServerFlowControllerSpawn();
 }
 
 void ASpatialFunctionalTest::RegisterAutoDestroyActor(AActor* ActorToAutoDestroy)
 {
+	if (!GetSpatialEnabled())
+	{
+		return;
+	}
 	if (ActorToAutoDestroy != nullptr && ActorToAutoDestroy->HasAuthority())
 	{
 		// Add component to actor to auto destroy when test finishes
@@ -185,7 +207,10 @@ void ASpatialFunctionalTest::RegisterAutoDestroyActor(AActor* ActorToAutoDestroy
 void ASpatialFunctionalTest::LogStep(ELogVerbosity::Type Verbosity, const FString& Message)
 {
 	Super::LogStep(Verbosity, Message);
-
+	if (!GetSpatialEnabled())
+	{
+		return;
+	}
 	if (Verbosity == ELogVerbosity::Error || Verbosity == ELogVerbosity::Fatal)
 	{
 		FinishTest(EFunctionalTestResult::Failed, TEXT("Failed assertions"));
@@ -194,6 +219,11 @@ void ASpatialFunctionalTest::LogStep(ELogVerbosity::Type Verbosity, const FStrin
 
 void ASpatialFunctionalTest::PrepareTest()
 {
+	if (!GetSpatialEnabled())
+	{
+		Super::PrepareTest();
+		return;
+	}
 	StepDefinitions.Empty();
 
 	Super::PrepareTest();
@@ -233,7 +263,10 @@ bool ASpatialFunctionalTest::IsReady_Implementation()
 void ASpatialFunctionalTest::StartTest()
 {
 	Super::StartTest();
-
+	if (!GetSpatialEnabled())
+	{
+		return;
+	}
 	StartStep(0);
 }
 
@@ -269,6 +302,10 @@ const FSpatialFunctionalTestStepDefinition ASpatialFunctionalTest::GetStepDefini
 
 int ASpatialFunctionalTest::GetNumberOfServerWorkers()
 {
+	if (!GetSpatialEnabled())
+	{
+		return 0;
+	}
 	int Counter = 0;
 	for (ASpatialFunctionalTestFlowController* FlowController : FlowControllers)
 	{
@@ -282,6 +319,10 @@ int ASpatialFunctionalTest::GetNumberOfServerWorkers()
 
 int ASpatialFunctionalTest::GetNumberOfClientWorkers()
 {
+	if (!GetSpatialEnabled())
+	{
+		return 0;
+	}
 	int Counter = 0;
 	for (ASpatialFunctionalTestFlowController* FlowController : FlowControllers)
 	{
@@ -295,6 +336,11 @@ int ASpatialFunctionalTest::GetNumberOfClientWorkers()
 
 void ASpatialFunctionalTest::FinishTest(EFunctionalTestResult TestResult, const FString& Message)
 {
+	if (!GetSpatialEnabled())
+	{
+		Super::FinishTest(TestResult, Message);
+		return;
+	}
 	if (HasAuthority())
 	{
 		// Make sure we don't FinishTest multiple times.
@@ -406,6 +452,10 @@ void ASpatialFunctionalTest::CrossServerFinishTest_Implementation(EFunctionalTes
 
 void ASpatialFunctionalTest::RegisterFlowController(ASpatialFunctionalTestFlowController* FlowController)
 {
+	if (!GetSpatialEnabled())
+	{
+		return;
+	}
 	if (FlowController->IsLocalController())
 	{
 		if (LocalFlowController != nullptr)
@@ -505,6 +555,11 @@ void ASpatialFunctionalTest::AddStepFromDefinitionMulti(const FSpatialFunctional
 
 void ASpatialFunctionalTest::StartStep(const int StepIndex)
 {
+	if (!GetSpatialEnabled())
+	{
+		UE_LOG(LogSpatialGDKFunctionalTests, Warning, TEXT("Starting a step when spatial functionality is overidden"));
+		return;
+	}
 	if (HasAuthority())
 	{
 		// Log Requires from previous step.
@@ -687,6 +742,11 @@ void ASpatialFunctionalTest::OnReplicated_bFinishedTest()
 
 void ASpatialFunctionalTest::StartServerFlowControllerSpawn()
 {
+	if (!GetSpatialEnabled())
+	{
+		UE_LOG(LogSpatialGDKFunctionalTests, Warning, TEXT("Starting a flow controller when spatial functionality is overidden"));
+		return;
+	}
 	if (!bReadyToSpawnServerControllers)
 	{
 		return;
@@ -702,6 +762,11 @@ void ASpatialFunctionalTest::StartServerFlowControllerSpawn()
 
 void ASpatialFunctionalTest::SetupClientPlayerRegistrationFlow()
 {
+	if (!GetSpatialEnabled())
+	{
+		UE_LOG(LogSpatialGDKFunctionalTests, Warning, TEXT("Should not be calling to setup registration flow when spatial is disabled"));
+		return;
+	}
 	PostLoginDelegate = FGameModeEvents::GameModePostLoginEvent.AddLambda([this](AGameModeBase* GameMode, APlayerController* NewPlayer) {
 		// NB : the delegate is a global one, have to filter in case we are running from PIE <==> multiple worlds.
 		if (NewPlayer->GetWorld() == GetWorld() && NewPlayer->HasAuthority())
@@ -713,6 +778,11 @@ void ASpatialFunctionalTest::SetupClientPlayerRegistrationFlow()
 
 void ASpatialFunctionalTest::EndPlay(const EEndPlayReason::Type Reason)
 {
+	if (!GetSpatialEnabled())
+	{
+		Super::EndPlay(Reason);
+		return;
+	}
 	if (PostLoginDelegate.IsValid())
 	{
 		FGameModeEvents::GameModePostLoginEvent.Remove(PostLoginDelegate);

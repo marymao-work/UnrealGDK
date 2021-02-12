@@ -52,7 +52,7 @@ private:
 	uint8 bReadyToSpawnServerControllers : 1;
 
 public:
-	ASpatialFunctionalTest();
+	ASpatialFunctionalTest(const FObjectInitializer& ObjectInitializer);
 
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
@@ -339,6 +339,10 @@ public:
 	// Clears all the snapshots taken, not meant to be used directly.
 	static void ClearAllTakenSnapshots();
 
+	bool GetSpatialEnabled() const { return bSpatialFunctionsEnabled; }
+
+	void SetSpatialEnabled(bool bNewSpatialSetting) { bSpatialFunctionsEnabled = bNewSpatialSetting; }
+
 protected:
 	void SetNumRequiredClients(int NewNumRequiredClients) { NumRequiredClients = FMath::Max(NewNumRequiredClients, 0); }
 
@@ -369,6 +373,11 @@ protected:
 	// Step Definition that will clear the SpatialOS snapshot for the current map.
 	UPROPERTY(BlueprintReadOnly, Category = "Spatial Functional Test")
 	FSpatialFunctionalTestStepDefinition ClearSnapshotStepDefinition;
+
+	UPROPERTY(EditAnywhere, Category = "Spatial Functional Test")
+	bool bSpatialFunctionsEnabled = true;
+
+	void EndPlay(const EEndPlayReason::Type Reason) override;
 
 private:
 	UPROPERTY(EditAnywhere, meta = (ClampMin = "0"), Category = "Spatial Functional Test")
@@ -425,7 +434,6 @@ private:
 	void StartServerFlowControllerSpawn();
 
 	void SetupClientPlayerRegistrationFlow();
-	void EndPlay(const EEndPlayReason::Type Reason) override;
 
 	FDelegateHandle PostLoginDelegate;
 
