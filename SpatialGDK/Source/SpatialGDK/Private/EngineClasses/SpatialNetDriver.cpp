@@ -2020,6 +2020,11 @@ void USpatialNetDriver::TickDispatch(float DeltaTime)
 				ClientConnectionManager->Advance();
 			}
 
+			if (IsValid(PlayerSpawner))
+			{
+				PlayerSpawner->Advance(Connection->GetCoordinator().GetViewDelta());
+			}
+
 			if (ActorSystem.IsValid())
 			{
 				ActorSystem->Advance();
