@@ -229,6 +229,8 @@ void ActorSystem::Advance()
 			break;
 		}
 	}
+
+	CreateEntityHandler.Advance(*SubView);
 }
 
 UnrealMetadata* ActorSystem::GetUnrealMetadata(const Worker_EntityId EntityId)
@@ -2084,8 +2086,7 @@ void ActorSystem::CreateEntityWithRetries(Worker_EntityId EntityId, FString Enti
 			break;
 		}
 	});
-
-	NetDriver->Receiver->AddCreateEntityDelegate(RequestId, MoveTemp(Delegate));
+	CreateEntityHandler.AddRequest(RequestId, Delegate);
 }
 
 TArray<FWorkerComponentData> ActorSystem::CopyEntityComponentData(const TArray<FWorkerComponentData>& EntityComponents)

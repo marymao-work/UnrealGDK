@@ -2030,6 +2030,11 @@ void USpatialNetDriver::TickDispatch(float DeltaTime)
 				ActorSystem->Advance();
 			}
 
+			if (IsValid(Sender))
+			{
+				Sender->Advance();
+			}
+
 			if (SpatialDebuggerSystem.IsValid())
 			{
 				SpatialDebuggerSystem->Advance();
