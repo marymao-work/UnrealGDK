@@ -2058,6 +2058,11 @@ void USpatialNetDriver::TickDispatch(float DeltaTime)
 			RoutingSystem->Advance(Connection);
 		}
 
+		if (IsValid(PackageMap))
+		{
+			PackageMap->Advance();
+		}
+
 		if (!bIsReadyToStart)
 		{
 			TryFinishStartup();
