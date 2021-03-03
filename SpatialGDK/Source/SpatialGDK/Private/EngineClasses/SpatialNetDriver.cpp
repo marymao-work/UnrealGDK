@@ -27,6 +27,7 @@
 #include "Interop/ClientConnectionManager.h"
 #include "Interop/Connection/SpatialConnectionManager.h"
 #include "Interop/Connection/SpatialWorkerConnection.h"
+#include "Interop/DebugMetricsSystem.h"
 #include "Interop/GlobalStateManager.h"
 #include "Interop/MigrationDiagnosticsSystem.h"
 #include "Interop/RPCExecutor.h"
@@ -2054,6 +2055,11 @@ void USpatialNetDriver::TickDispatch(float DeltaTime)
 			{
 				SpatialGDK::MigrationDiagnosticsSystem MigrationDiagnosticsSystem(*this);
 				MigrationDiagnosticsSystem.ProcessOps(Connection->GetCoordinator().GetViewDelta().GetWorkerMessages());
+			}
+
+			{
+				SpatialGDK::DebugMetricsSystem DebugMetricsSystem(*this);
+				DebugMetricsSystem.ProcessOps(Connection->GetCoordinator().GetViewDelta().GetWorkerMessages());
 			}
 
 			{
